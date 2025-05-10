@@ -1,0 +1,73 @@
+using BookStore_Domain.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace BookStore_Domain.Seeders;
+
+public interface IBookStoreSeeder
+{
+    Task Seed();
+}
+
+public class BookStoreSeeder : IBookStoreSeeder
+{
+    private readonly DataContext _context;
+
+    public BookStoreSeeder(DataContext context)
+    {
+        _context = context;
+    }
+
+    public async Task Seed()
+    {
+        if (!_context.Categories.Any())
+        {
+            var categories = new List<Category>
+            {
+                new Category { Name = "Fiction", Description = "Fiction books" },
+                new Category { Name = "Non-Fiction", Description = "Non-fiction books" },
+                new Category { Name = "Science", Description = "Science books" },
+                new Category { Name = "History", Description = "History books" }
+            };
+
+            await _context.Categories.AddRangeAsync(categories);
+            await _context.SaveChangesAsync();
+        }
+
+        if (!_context.Books.Any())
+        {
+            var fictionCategory = await _context.Categories.FirstOrDefaultAsync(c => c.Name == "Fiction");
+            var scienceCategory = await _context.Categories.FirstOrDefaultAsync(c => c.Name == "Science");
+
+            var books = new List<Book>
+            {
+                new Book
+                {
+                    Title = "The Great Gatsby",
+                    Author = "F. Scott Fitzgerald",
+                    ISBN = "978-0743273565",
+                    Price = 9.99m,
+                    Stock = 50,
+                    Sku = "TG001",
+                    Book_Category = fictionCategory,
+                    Publisher = "Scribner",
+                    PublicationYear = 2004
+                },
+                new Book
+                {
+                    Title = "A Brief History of Time",
+                    Author = "Stephen Hawking",
+                    ISBN = "978-0553380163",
+                    Price = 14.99m,
+                    Stock = 30,
+                    Sku = "BH001",
+                    Book_Category = scienceCategory,
+                    Publisher = "Bantam",
+                    PublicationYear = 1998
+                }
+            };
+
+            await _context.Books.AddRangeAsync(books);
+            await _context.SaveChangesAsync();
+        }
+    }
+} 
