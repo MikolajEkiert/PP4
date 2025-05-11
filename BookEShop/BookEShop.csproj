@@ -13,4 +13,9 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\BookEShop.Application\BookEShop.Application.csproj" />
+    <ProjectReference Include="..\BookEShop.Domain\BookEShop.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
