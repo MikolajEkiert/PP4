@@ -1,5 +1,6 @@
 ﻿using BookEShop.Domain.Models;
 using BookEShop.Domain.Repositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,14 +9,8 @@ using System.Threading.Tasks;
 
 namespace BookEShop.Domain.Seeders;
 
-public class BookStoreSeeder : IBookEShopSeeder
+public class BookEShopSeeder(DataContext _context) : IBookEShopSeeder
 {
-    private readonly DataContext _context;
-
-    public BookStoreSeeder(DataContext context)
-    {
-        _context = context;
-    }
 
     public async Task Seed()
     {
@@ -38,6 +33,11 @@ public class BookStoreSeeder : IBookEShopSeeder
             var fictionCategory = await _context.Categories.FirstOrDefaultAsync(c => c.Name == "Fiction");
             var scienceCategory = await _context.Categories.FirstOrDefaultAsync(c => c.Name == "Science");
 
+            if (fictionCategory == null || scienceCategory == null)
+            {
+                throw new InvalidOperationException("Required categories not found in the database.");
+            }
+
             var books = new List<Book>
             {
                 new Book
@@ -48,8 +48,7 @@ public class BookStoreSeeder : IBookEShopSeeder
                     Price = 9.99m,
                     Stock = 50,
                     Sku = "TG001",
-                    Book_Category = fictionCategory,
-                    Publisher = "Scribner",
+                    BookCategory = fictionCategory,
                     PublicationYear = 2004
                 },
                 new Book
@@ -60,8 +59,7 @@ public class BookStoreSeeder : IBookEShopSeeder
                     Price = 14.99m,
                     Stock = 30,
                     Sku = "BH001",
-                    Book_Category = scienceCategory,
-                    Publisher = "Bantam",
+                    BookCategory = scienceCategory,
                     PublicationYear = 1998
                 }
             };

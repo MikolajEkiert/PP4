@@ -9,7 +9,7 @@ namespace BookEShop.Domain.Repositories;
 
 public interface IBookRepository
 {
-    Task<IEnumerable<Book>> GetAllBooks();
+    Task<List<Book>> GetAllBooks();
     Task<Book?> GetBookById(int id);
     Task<Book?> GetBookByISBN(string isbn);
     Task<Book> AddBook(Book book);

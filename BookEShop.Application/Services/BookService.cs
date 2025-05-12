@@ -9,13 +9,13 @@ using BookEShop.Domain.Repositories;
 
 namespace BookEShop.Application.Services;
 
-public class Book_Service : IBookService
+public class BookService : IBookService
 {
     private readonly IBookRepository _bookRepository;
 
-    public Book_Service(IBookRepository bookRepository)
+    public BookService(IBookRepository bookRepository)
     {
-        _bookRepository = bookRepository;
+        _bookRepository = bookRepository; 
     }
 
     public async Task<IEnumerable<Book>> GetAllBooks()

@@ -8,28 +8,22 @@ using System.Threading.Tasks;
 
 namespace BookEShop.Domain.Repositories;
 
-public class Book_Repository : IBookRepository
+public class BookRepository(DataContext _context) : IBookRepository
 {
-    private readonly DataContext _context;
 
-    public Book_Repository(DataContext context)
+    public async Task<List<Book>> GetAllBooks()
     {
-        _context = context;
-    }
-
-    public async Task<IEnumerable<Book>> GetAllBooks()
-    {
-        return await _context.Books.Include(b => b.Book_Category).ToListAsync();
+        return await _context.Books.Include(b => b.BookCategory).ToListAsync();
     }
 
     public async Task<Book?> GetBookById(int id)
     {
-        return await _context.Books.Include(b => b.Book_Category).FirstOrDefaultAsync(b => b.Id == id);
+        return await _context.Books.Include(b => b.BookCategory).FirstOrDefaultAsync(b => b.Id == id);
     }
 
     public async Task<Book?> GetBookByISBN(string isbn)
     {
-        return await _context.Books.Include(b => b.Book_Category).FirstOrDefaultAsync(b => b.ISBN == isbn);
+        return await _context.Books.Include(b => b.BookCategory).FirstOrDefaultAsync(b => b.ISBN == isbn);
     }
 
     public async Task<Book> AddBook(Book book)
@@ -58,14 +52,14 @@ public class Book_Repository : IBookRepository
 
     public async Task<IEnumerable<Book>> GetBooksByCategory(int categoryId)
     {
-        return await _context.Books.Include(b => b.Book_Category)
-            .Where(b => b.Book_Category.Id == categoryId)
+        return await _context.Books.Include(b => b.BookCategory)
+            .Where(b => b.BookCategory.Id == categoryId)
             .ToListAsync();
     }
 
     public async Task<IEnumerable<Book>> SearchBooks(string searchTerm)
     {
-        return await _context.Books.Include(b => b.Book_Category)
+        return await _context.Books.Include(b => b.BookCategory)
             .Where(b => b.Title.Contains(searchTerm) ||
                        b.Author.Contains(searchTerm) ||
                        b.ISBN.Contains(searchTerm))
