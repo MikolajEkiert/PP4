@@ -14,10 +14,15 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Services.AddDbContext<DataContext>(x => x.UseInMemoryDatabase("TestDb"), ServiceLifetime.Transient);
+        // Repositories
         builder.Services.AddScoped<IBookRepository, BookRepository>();
         builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-
+        builder.Services.AddScoped<IShoppingCartRepository, ShoppingCartRepository>();
+        builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+        // Services
         builder.Services.AddScoped<IBookService, BookService>();
+        builder.Services.AddScoped<IOrderService, OrderService>();
+        builder.Services.AddScoped<IShoppingCartService, ShoppingCartService>();
 
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
