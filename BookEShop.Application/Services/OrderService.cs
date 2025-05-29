@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BookEShop.Application.Interfaces;
+﻿using BookEShop.Application.Interfaces;
 using BookEShop.Domain.Models;
 using BookEShop.Domain.Repositories;
 using BookEShop.Domain.Enums;
@@ -44,32 +39,46 @@ public class OrderService : IOrderService
 
     public async Task<Order> CreateOrder(string customerEmail, string shippingAddress, List<OrderItem> items)
     {
-        var order = new Order
-        {
-            OrderNumber = GenerateOrderNumber(),
-            CustomerEmail = customerEmail,
-            ShippingAddress = shippingAddress,
-            Status = OrderStatus.Pending,
-            OrderItems = items,
-            TotalAmount = items.Sum(item => item.Subtotal)
-        };
+        if (items == null || !items.Any())
+            throw new ArgumentException("Order must contain at least one item.");
+
+        var bookCache = new Dictionary<int, Book>();
 
         foreach (var item in items)
         {
-            var book = await _bookRepository.GetBookById(item.BookId);
-            if (book == null)
-                throw new ArgumentException($"Book with ID {item.BookId} not found");
+            if (!bookCache.TryGetValue(item.BookId, out var book))
+            {
+                book = await _bookRepository.GetBookById(item.BookId);
+                if (book == null)
+                    throw new ArgumentException($"Book with ID {item.BookId} does not exist.");
+                bookCache[item.BookId] = book;
+            }
 
             if (book.Stock < item.Quantity)
-                throw new InvalidOperationException($"Insufficient stock for book {book.Title}");
+                throw new InvalidOperationException($"Insufficient stock for book ID {item.BookId}.");
+        }
 
+        var order = new Order
+        {
+            CustomerEmail = customerEmail,
+            ShippingAddress = shippingAddress,
+            OrderItems = items,
+            TotalAmount = items.Sum(i => i.Subtotal),
+            Status = OrderStatus.Pending,
+            OrderNumber = GenerateOrderNumber()
+        };
+
+        await _orderRepository.AddOrder(order);
+
+        foreach (var item in items)
+        {
+            var book = bookCache[item.BookId];
             book.Stock -= item.Quantity;
             await _bookRepository.UpdateBook(book);
         }
 
-        return await _orderRepository.AddOrder(order);
+        return order;
     }
-
     public async Task<Order> UpdateOrderStatus(int orderId, OrderStatus status)
     {
         var order = await _orderRepository.GetOrderById(orderId);

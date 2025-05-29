@@ -85,6 +85,16 @@ public class BooksController : ControllerBase
     [HttpPut("{id}/stock")]
     public async Task<IActionResult> UpdateStock(int id, [FromBody] int quantity)
     {
+        if (quantity < 0)
+            return BadRequest("Quantity cannot be negative");
+
+        var book = await _bookService.GetBookById(id);
+        if (book == null)
+            return NotFound();
+
+        if (book.Stock + quantity < 0)
+            return BadRequest("Stock cannot be negative");
+
         var success = await _bookService.UpdateStock(id, quantity);
         if (!success)
             return BadRequest("Invalid stock update");

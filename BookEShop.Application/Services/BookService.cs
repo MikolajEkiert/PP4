@@ -35,6 +35,15 @@ public class BookService : IBookService
 
     public async Task<Book> AddBook(Book book)
     {
+        if (string.IsNullOrWhiteSpace(book.Title))
+            throw new ArgumentException("Book title is required.");
+
+        if (book.Price <= 0)
+            throw new ArgumentException("Book price must be greater than zero.");
+
+        if (book.Stock < 0)
+            throw new ArgumentException("Book stock cannot be negative.");
+
         return await _bookRepository.AddBook(book);
     }
 
@@ -64,10 +73,10 @@ public class BookService : IBookService
         if (book == null)
             return false;
 
-        book.Stock += quantity;
-        if (book.Stock < 0)
+        if (book.Stock + quantity < 0)
             return false;
 
+        book.Stock += quantity;
         await _bookRepository.UpdateBook(book);
         return true;
     }

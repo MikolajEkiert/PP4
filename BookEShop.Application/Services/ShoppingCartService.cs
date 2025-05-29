@@ -72,24 +72,16 @@ public class ShoppingCartService : IShoppingCartService
 
     public async Task<CartItem> AddItemToCart(int shoppingCartId, int bookId, int quantity)
     {
-        var shoppingCart = await _shoppingCartRepository.GetShoppingCartById(shoppingCartId);
-        if (shoppingCart == null)
+        var cart = await _shoppingCartRepository.GetShoppingCartById(shoppingCartId);
+        if (cart == null)
             throw new ArgumentException("Shopping cart not found");
 
         var book = await _bookRepository.GetBookById(bookId);
         if (book == null)
             throw new ArgumentException("Book not found");
 
-        if (book.Stock.ToString().Length < quantity)
+        if (book.Stock < quantity)
             throw new InvalidOperationException("Insufficient stock");
-
-        var existingItem = shoppingCart.CartItems.FirstOrDefault(i => i.BookId == bookId);
-        if (existingItem != null)
-        {
-            existingItem.Quantity += quantity;
-            existingItem.Subtotal = existingItem.Quantity * existingItem.UnitPrice;
-            return await _shoppingCartRepository.UpdateCartItem(existingItem);
-        }
 
         var cartItem = new CartItem
         {
@@ -100,9 +92,9 @@ public class ShoppingCartService : IShoppingCartService
             Subtotal = book.Price * quantity
         };
 
-        return await _shoppingCartRepository.AddCartItem(cartItem);
+        await _shoppingCartRepository.AddCartItem(cartItem);
+        return cartItem;
     }
-
     public async Task<CartItem> UpdateCartItemQuantity(int cartItemId, int quantity)
     {
         var cartItem = await _shoppingCartRepository.GetCartItemById(cartItemId);
