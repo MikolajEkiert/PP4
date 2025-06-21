@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using BookEShop.Application.Interfaces;
 using BookEShop.Domain.Models;
@@ -17,6 +18,7 @@ public class BooksController : ControllerBase
         _bookService = bookService;
     }
 
+    [Authorize]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Book>>> GetAllBooks()
     {
