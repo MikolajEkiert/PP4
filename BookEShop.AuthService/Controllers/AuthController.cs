@@ -5,10 +5,9 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
-using BookEShop.Domain.Models;
+using BookEShop.AuthService.Models;
 
-namespace BookEShop.Controllers
+namespace BookEShop.AuthService.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -22,33 +21,27 @@ namespace BookEShop.Controllers
         }
 
         [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginDto login)
+        public IActionResult Login([FromBody] LoginDto credentials)
         {
-            
-            if (string.IsNullOrEmpty(login.Email) || string.IsNullOrEmpty(login.Password))
-            {
+            // TODO: Validate credentials against your user store
+            if (string.IsNullOrEmpty(credentials.Email) || string.IsNullOrEmpty(credentials.Password))
                 return Unauthorized();
-            }
 
-            var authClaims = new[]
+            var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, login.Email),
+                new Claim(JwtRegisteredClaimNames.Sub, credentials.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
-            var jwtKey = _configuration["Jwt:Key"];
-            if (string.IsNullOrEmpty(jwtKey))
-            {
-                throw new InvalidOperationException("Jwt:Key is not configured in appsettings.json");
-            }
-            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],
+                claims: claims,
                 expires: DateTime.Now.AddMinutes(60),
-                claims: authClaims,
-                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+                signingCredentials: creds
             );
 
             return Ok(new

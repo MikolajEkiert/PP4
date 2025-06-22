@@ -8,4 +8,24 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8080:80"
-      - "8081:443" 
+      - "8081:443"
+  catalogservice:
+    image: ${DOCKER_REGISTRY-}catalogservice
+    build:
+      context: ./BookEShop.CatalogService
+      dockerfile: Dockerfile
+  orderservice:
+    image: ${DOCKER_REGISTRY-}orderservice
+    build:
+      context: ./BookEShop.OrderService
+      dockerfile: Dockerfile
+  cartservice:
+    image: ${DOCKER_REGISTRY-}cartservice
+    build:
+      context: ./BookEShop.CartService
+      dockerfile: Dockerfile
+  authservice:
+    image: ${DOCKER_REGISTRY-}authservice
+    build:
+      context: ./BookEShop.AuthService
+      dockerfile: Dockerfile
