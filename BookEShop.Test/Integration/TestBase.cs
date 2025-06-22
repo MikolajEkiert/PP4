@@ -11,7 +11,7 @@ public abstract class TestBase : IAsyncLifetime
 {
     private readonly WebApplicationFactory<Program> _factory;
     protected readonly HttpClient Client;
-    protected DataContext Context;
+    protected DataContext Context = null!;
     private readonly string _dbName;
 
     protected TestBase()
@@ -57,6 +57,7 @@ public abstract class TestBase : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
+        
         if (Context != null)
         {
             await Context.Database.EnsureDeletedAsync();

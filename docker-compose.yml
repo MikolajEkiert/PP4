@@ -1,5 +1,3 @@
-version: '3.4'
-
 services:
   bookeshop:
     image: ${DOCKER_REGISTRY-}bookeshop
@@ -14,18 +12,26 @@ services:
     build:
       context: ./BookEShop.CatalogService
       dockerfile: Dockerfile
+    ports:
+      - "5001:80"
   orderservice:
     image: ${DOCKER_REGISTRY-}orderservice
     build:
       context: ./BookEShop.OrderService
       dockerfile: Dockerfile
+    ports:
+      - "5002:80"
   cartservice:
     image: ${DOCKER_REGISTRY-}cartservice
     build:
       context: ./BookEShop.CartService
       dockerfile: Dockerfile
+    ports:
+      - "5003:80"
   authservice:
     image: ${DOCKER_REGISTRY-}authservice
     build:
       context: ./BookEShop.AuthService
       dockerfile: Dockerfile
+    ports:
+      - "5004:80"
