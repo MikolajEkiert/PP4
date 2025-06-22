@@ -15,6 +15,10 @@ COPY "BookEShop/*.csproj" "./BookEShop/"
 COPY "BookEShop.Application/*.csproj" "./BookEShop.Application/"
 COPY "BookEShop.Domain/*.csproj" "./BookEShop.Domain/"
 COPY "BookEShop.Test/*.csproj" "./BookEShop.Test/"
+COPY "BookEShop.OrderService/*.csproj" "./BookEShop.OrderService/"
+COPY "BookEShop.CatalogService/*.csproj" "./BookEShop.CatalogService/"
+COPY "BookEShop.CartService/*.csproj" "./BookEShop.CartService/"
+COPY "BookEShop.AuthService/*.csproj" "./BookEShop.AuthService/"
 RUN dotnet restore
 
 COPY . ./
