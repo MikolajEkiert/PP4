@@ -1,0 +1,11 @@
+version: '3.4'
+
+services:
+  bookeshop:
+    image: ${DOCKER_REGISTRY-}bookeshop
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+      - "8081:443" 
